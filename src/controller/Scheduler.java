@@ -106,7 +106,6 @@ public class Scheduler {
         while (!queue.isEmpty()) {
             Task task = queue.poll();
             if (task != null) {
-                Logger.log("Executando: " + task.getId());
                 task.setStatus(TaskStatus.RUNNING);
                 task.getAction().run();
                 task.setStatus(TaskStatus.COMPLETED);
