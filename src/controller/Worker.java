@@ -18,12 +18,12 @@ public class Worker extends Thread {
             try {
                 Task task = scheduler.getNextTask();
                 if (task == null) {
-                    Thread.sleep(500); // Espera até uma tarefa ficar disponível
+                    Thread.sleep(500);
                     continue;
                 }
 
                 Logger.log("Worker " + workerId + " executando tarefa " + task.getId());
-                Thread.sleep(2000); // Simula tempo de execução
+                Thread.sleep(2000);
                 scheduler.markTaskCompleted(task);
                 Logger.log("Worker " + workerId + " completou tarefa " + task.getId());
             } catch (InterruptedException e) {

@@ -29,7 +29,7 @@ public class Task implements Comparable<Task> {
         return dependencies;
     }
 
-    public Runnable getAction() { // <-- ESTE MÉTODO
+    public Runnable getAction() { 
         return action;
     }
 
@@ -43,6 +43,6 @@ public class Task implements Comparable<Task> {
 
     @Override
     public int compareTo(Task other) {
-        return Integer.compare(other.priority, this.priority); // maior prioridade primeiro
+        return Integer.compare(other.priority, this.priority);
     }
 }

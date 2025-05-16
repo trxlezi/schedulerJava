@@ -15,7 +15,7 @@ public class DeadlockDetector extends Thread {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(10000); // Verifica a cada 10 segundos
+                Thread.sleep(10000);
                 detectAndResolveDeadlock();
             } catch (InterruptedException e) {
                 Logger.log("Detector de deadlock interrompido.");

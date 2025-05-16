@@ -12,7 +12,6 @@ public class Scheduler {
     private final Map<String, Task> allTasks = new ConcurrentHashMap<>();
     private final Set<String> completed = ConcurrentHashMap.newKeySet();
 
-    // Fila de tarefas prontas para execução (maior prioridade primeiro)
     private final PriorityBlockingQueue<Task> queue =
             new PriorityBlockingQueue<>(100, Comparator.comparingInt(Task::getPriority).reversed());
 
@@ -23,7 +22,7 @@ public class Scheduler {
     
             if (hasCircularDependency(task)) {
                 Logger.log("Erro: dependência circular detectada ao adicionar a tarefa " + task.getId());
-                allTasks.remove(task.getId()); // Remove imediatamente
+                allTasks.remove(task.getId());
                 return;
             }
     
@@ -49,7 +48,6 @@ public class Scheduler {
                 queue.remove(removed);
             }
     
-            // Também remove de dependências de outras tarefas
             for (Task task : allTasks.values()) {
                 task.getDependencies().remove(id);
             }
@@ -57,7 +55,6 @@ public class Scheduler {
     }
     
 
-    // Remove uma tarefa do sistema
     public synchronized void removeTask(String id) {
         Task removed = allTasks.remove(id);
         if (removed != null) {
@@ -65,7 +62,6 @@ public class Scheduler {
         }
     }
 
-    // Verifica se as dependências de uma tarefa foram todas concluídas
     private boolean areDependenciesCompleted(Task task) {
         for (String depId : task.getDependencies()) {
             if (!completed.contains(depId)) {
@@ -100,7 +96,6 @@ public class Scheduler {
         return false;
     }    
 
-    // Executa tarefas sequencialmente (modo CLI)
     public synchronized void executePendingTasks() {
         Logger.log("Executando tarefas pendentes...");
         while (!queue.isEmpty()) {
@@ -111,30 +106,26 @@ public class Scheduler {
                 task.setStatus(TaskStatus.COMPLETED);
                 completed.add(task.getId());
 
-                // Atualiza a fila com possíveis tarefas desbloqueadas
                 updateReadyTasks();
             }
         }
     }
 
-    // Usado por workers: obtém próxima tarefa pronta para execução
     public Task getNextTask() {
         try {
-            return queue.poll(1, TimeUnit.SECONDS); // espera até 1s por uma tarefa
+            return queue.poll(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return null;
         }
     }
 
-    // Marca uma tarefa como concluída (usado pelos workers)
     public synchronized void markTaskCompleted(Task task) {
         completed.add(task.getId());
         task.setStatus(TaskStatus.COMPLETED);
         updateReadyTasks();
     }
 
-    // Atualiza a fila com tarefas que ficaram prontas após dependência ser resolvida
     private void updateReadyTasks() {
         for (Task task : allTasks.values()) {
             if (task.getStatus() == TaskStatus.PENDING && areDependenciesCompleted(task)) {
@@ -145,7 +136,6 @@ public class Scheduler {
         }
     }
 
-    // Lista todas as tarefas (para CLI)
     public List<Task> listTasks() {
         return new ArrayList<>(allTasks.values());
     }
